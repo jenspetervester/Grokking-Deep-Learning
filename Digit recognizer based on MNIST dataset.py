@@ -181,17 +181,18 @@ for x in range(300):
         for j in range(len(weights[0])):
             weights[i][j] -= alpha * weight_deltas[i][j]
 
-n = len(weights)
-cols = 5
-rows = 2
 
-gs = gridspec.GridSpec(rows, cols)
-fig = plt.figure()
+def plot_weights(weights):
+    cols = 5
+    rows = 2
+    gs = gridspec.GridSpec(rows, cols)
+    fig = plt.figure()
+    for i in range(len(weights)):
+        ax = fig.add_subplot(gs[i])
+        ax.set_title("weight set: {}".format(i))
+        a = np.array(to_2d_array(weights[i]))
+        plt.imshow(a)
+    plt.show()
 
-fig = plt.figure(figsize=(6, 3.2))
-for i in range(len(weights)):
-    ax = fig.add_subplot(gs[i])
-    ax.set_title("weight set: {}".format(i))
-    a = np.array(to_2d_array(weights[i]))
-    plt.imshow(a)
-plt.show()
+
+plot_weights(weights)
