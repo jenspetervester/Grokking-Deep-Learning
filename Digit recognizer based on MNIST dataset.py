@@ -3,14 +3,13 @@
 
 # In[1]:
 
-import matplotlib
 import matplotlib.pyplot as plt
 from mnist import MNIST
+import numpy as np
+from matplotlib import gridspec
+
 mndata = MNIST('C:\\Users\\jpv\\Dropbox\\src\\grokking_deep_learning')
 images, labels = mndata.load_training()
-
-print("num images: {}".format(len(images)))
-print("num images: {}".format(len(labels)))
 
 
 # In[2]:
@@ -18,24 +17,28 @@ print("num images: {}".format(len(labels)))
 import vector_ops as vops
 def show_number(raw_image, label):
     """interprets raw_image as a 28x28 matrix and displays it"""
-    image = vops.matrix_of_zeroes(28, 28)
+    image = to_2d_array(raw_image)
 
+    plt.matshow(image)
+    plt.show()
+    print("This is {}".format(label))
+
+
+def to_2d_array(raw_image):
+    image = vops.matrix_of_zeroes(28, 28)
     offset = 0
     for row in range(28):
         lastOffset = offset
         offset += 28
-        image[row] = raw_image[lastOffset:offset] 
-
-    plt.matshow(image)
-    plt.show()
-    print("This is {}".format(label)) 
+        image[row] = raw_image[lastOffset:offset]
+    return image
 
 
 # In[3]:
 
 #for i in range(10):
 #    show_number(images[i], labels[i]) 
-show_number(images[0], labels[0])
+#show_number(images[0], labels[0])
 
 
 # In[4]:
@@ -178,3 +181,17 @@ for x in range(300):
         for j in range(len(weights[0])):
             weights[i][j] -= alpha * weight_deltas[i][j]
 
+n = len(weights)
+cols = 5
+rows = 2
+
+gs = gridspec.GridSpec(rows, cols)
+fig = plt.figure()
+
+fig = plt.figure(figsize=(6, 3.2))
+for i in range(len(weights)):
+    ax = fig.add_subplot(gs[i])
+    ax.set_title("weight set: {}".format(i))
+    a = np.array(to_2d_array(weights[i]))
+    plt.imshow(a)
+plt.show()
