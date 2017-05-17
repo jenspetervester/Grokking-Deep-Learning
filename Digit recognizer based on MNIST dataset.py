@@ -127,8 +127,6 @@ def neural_network(inputs, weights):
 
 import random as rand
 
-sample = 0; # represents number 5
-input = images[0]
 goal_predictions = [
     [1,0,0,0,0,0,0,0,0,0], # P(0) = 1
     [0,1,0,0,0,0,0,0,0,0], # 1
@@ -142,44 +140,51 @@ goal_predictions = [
     [0,0,0,0,0,0,0,0,0,1]  # 9
 ]
 
-label = labels[sample]
-print("label: {}".format(label))
-goal_prediction = goal_predictions[label]
-
 #784 (28*28 pixels) inputs (one per pixel) and 10 predictions, each a number describing the likelihood of it being true
 #each prediction has a weight for every one of the 784 pixels/inputs
 
 #there is a set of 28*28 weights for each output
 weights = []
+input_size = len(images[0])
 for i in range(10):
     outputs = []
-    for j in range(len(input)):
+    for j in range(input_size):
         outputs.append(rand.random())
     weights.append(outputs)
 
 alpha = 0.00000001
-  
-for x in range(300):
-    pred = neural_network(input, weights) 
-    print("pred: {}".format(pred))
-    error = [0] * len(goal_prediction)
-    delta = [0] * len(goal_prediction)
 
-    for i in range(len(goal_prediction)):
-        error[i] = (pred[i] - goal_prediction[i]) ** 2
-        delta[i] = pred[i] - goal_prediction[i]
+for ix in range(100):
+    label = labels[ix]
+    inputs = images[ix]
+    goal_prediction = goal_predictions[label]
+    print(ix)
+    for x in range(300):
+        pred = neural_network(inputs, weights)
+        error = [0] * len(goal_prediction)
+        delta = [0] * len(goal_prediction)
 
-    print("error: {}, delta: {}".format(error, delta))
-    
-    #weight_deltas = outer_prod(input, delta)
-    #print("len delta {}, len input {}".format(len(delta), len(input)))
-    weight_deltas = outer_prod(delta, input)
-    #print(weight_deltas)
-    
-    #update weights
-    for i in range(len(weights)):
-        for j in range(len(weights[0])):
-            weights[i][j] -= alpha * weight_deltas[i][j]
+        for i in range(len(goal_prediction)):
+            error[i] = (pred[i] - goal_prediction[i]) ** 2
+            delta[i] = pred[i] - goal_prediction[i]
+
+        if ix % 10 == 0:
+            print("error: {}, delta: {}".format(error, delta))
+            print("pred: {}".format(pred))
+
+        #weight_deltas = outer_prod(input, delta)
+        #print("len delta {}, len input {}".format(len(delta), len(input)))
+        weight_deltas = outer_prod(delta, inputs)
+        #print(weight_deltas)
+
+        #update weights
+        # is this right? just updating the weights related to the label
+        for b in range(len(weights[0])):
+            weights[label][b] -= alpha * weight_deltas[label][b]
+
+       # probably wrong but kind of works
+        #for b in range(len(weights[0])):
+         #   weights[label][b] -= alpha * weight_deltas[label][b]
 
 
 def plot_weights(weights):
@@ -192,7 +197,12 @@ def plot_weights(weights):
         ax.set_title("weight set: {}".format(i))
         a = np.array(to_2d_array(weights[i]))
         plt.imshow(a)
+    plt.colorbar()
     plt.show()
 
-
 plot_weights(weights)
+
+print("test: providing image of {}, prediction: {}".format(labels[0], neural_network(images[0], weights)))
+print("test: providing image of {}, prediction: {}".format(labels[1], neural_network(images[1], weights)))
+print("test: providing image of {}, prediction: {}".format(labels[2], neural_network(images[2], weights)))
+print("test: providing image of {}, prediction: {}".format(labels[3], neural_network(images[3], weights)))
