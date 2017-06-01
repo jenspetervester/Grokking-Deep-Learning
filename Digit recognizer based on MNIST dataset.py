@@ -152,14 +152,31 @@ for i in range(10):
         outputs.append(rand.random())
     weights.append(outputs)
 
-alpha = 0.00000001
+# 71 % correct
+#alpha = 0.0000000001
+#num_images = 2000
+#iterations = 65
 
-for ix in range(100):
+#67 % correct
+#alpha = 0.0000000002
+#num_images = 2000
+#iterations = 65
+
+# 76 % correct
+#alpha = 0.0000000001
+#num_images = 2000
+#iterations = 70
+
+alpha = 0.0000000001
+num_images = 2000
+iterations = 70
+
+for ix in range(num_images):
     label = labels[ix]
     inputs = images[ix]
     goal_prediction = goal_predictions[label]
     print(ix)
-    for x in range(300):
+    for x in range(iterations):
         pred = neural_network(inputs, weights)
         error = [0] * len(goal_prediction)
         delta = [0] * len(goal_prediction)
@@ -182,11 +199,6 @@ for ix in range(100):
         for b in range(len(weights[0])):
             weights[label][b] -= alpha * weight_deltas[label][b]
 
-       # probably wrong but kind of works
-        #for b in range(len(weights[0])):
-         #   weights[label][b] -= alpha * weight_deltas[label][b]
-
-
 def plot_weights(weights):
     cols = 5
     rows = 2
@@ -202,7 +214,20 @@ def plot_weights(weights):
 
 plot_weights(weights)
 
-print("test: providing image of {}, prediction: {}".format(labels[0], neural_network(images[0], weights)))
-print("test: providing image of {}, prediction: {}".format(labels[1], neural_network(images[1], weights)))
-print("test: providing image of {}, prediction: {}".format(labels[2], neural_network(images[2], weights)))
-print("test: providing image of {}, prediction: {}".format(labels[3], neural_network(images[3], weights)))
+correct = 0
+incorrect = 0
+test_range = 10000
+for i in range(test_range):
+    ix = len(images) - i - 1
+    label = labels[ix]
+    prediction = neural_network(images[ix], weights)
+    predictedLabel = prediction.index(min(prediction))
+    if label == predictedLabel:
+        correct += 1
+    else:
+        incorrect +=1
+
+    print("test: providing image of {}, prediction: {}".format(label, predictedLabel))
+
+print("correct: {}, incorrect: {}, percent correct: {}".format(correct, incorrect, (correct/test_range)*100))
+print("alpha: {}, num_images: {}, iterations: {}".format(alpha, num_images, iterations))
